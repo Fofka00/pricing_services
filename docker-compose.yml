@@ -11,10 +11,11 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    
 
   app:
     build: .
-    command: npm run start
+    command: sh -c "npx knex migrate:latest --knexfile=knexfile.js && npm run start"
     volumes:
       - .:/app
     ports:
