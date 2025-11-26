@@ -24,6 +24,7 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    command: sh -c "npx knex migrate:latest --knexfile=knexfile.js && npm run start"
 
 volumes:
   pgdata:
