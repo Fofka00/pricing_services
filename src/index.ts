@@ -22,16 +22,18 @@ const db = knex({
 });
 
 async function saveTariffs(data: any) {
+  console.log('Данные для сохранения в базу:', data);
   await db('tariffs').insert({
     dt_till_max: data.dtTillMax,
     warehouse_list: JSON.stringify(data.warehouseList),
   });
-  console.log('Тарифы сохранены в базу');
+  console.log('Тарифы успешно сохранены в базу');
 }
 
 async function fetchTariffs() {
   const today = new Date().toISOString().slice(0, 10);
   try {
+    console.log('Начинаю запрос тарифов...');
     const response = await axios.get('https://common-api.wildberries.ru/api/v1/tariffs/box', {
       headers: {
         'Authorization': `Bearer ${WB_API_KEY}`,
@@ -40,22 +42,31 @@ async function fetchTariffs() {
         date: today,
       },
     });
-    console.log('Tariffs fetched:', response.data);
+    console.log('Ответ получен:', response.data);
     const data = response.data.response.data;
+    console.log('Данные для сохранения:', data);
     await saveTariffs(data);
     const tariffs = await db('tariffs').select('*');
+    console.log('Тарифы из базы:', tariffs);
     await uploadToGoogleSheets(tariffs);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error('Axios error:', error.response?.status, error.response?.data);
     } else if (error instanceof Error) {
-      console.error('Error fetching tariffs:', error.message);
+      console.error('Ошибка при запросе тарифов:', error.message);
     } else {
-      console.error('Unknown error:', error);
+      console.error('Неизвестная ошибка:', error);
     }
   }
 }
 
-setInterval(fetchTariffs, 60 * 60 * 1000);
 
+console.log('Сервис запущен. Начинаю работу...');
 fetchTariffs();
+
+process.stdin.resume();
+
+setInterval(() => {
+  console.log('Запуск повторного получения тарифов...');
+  fetchTariffs();
+}, 60 * 60 * 1000);

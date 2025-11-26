@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:13
@@ -11,13 +9,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    
 
   app:
     build: .
-    command: sh -c "npx knex migrate:latest --knexfile=knexfile.js && npm run start"
-    volumes:
-      - .:/app
     ports:
       - "3000:3000"
     environment:
@@ -29,6 +23,7 @@ services:
       WB_API_KEY: ${WB_API_KEY}
     depends_on:
       - postgres
+    restart: unless-stopped
 
 volumes:
   pgdata:

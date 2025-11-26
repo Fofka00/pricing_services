@@ -2,7 +2,7 @@ import { google } from 'googleapis';
 
 export async function uploadToGoogleSheets(data: any[]) {
   const auth = new google.auth.GoogleAuth({
-    keyFile: 'credentials/sound-berm-479311-c8-bbc3ebdf3a67.json',
+    keyFile: 'credentials/sound-berm-479311-c8-8529cbad157d.json',
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
